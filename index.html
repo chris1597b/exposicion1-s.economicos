@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Optimización de Producción | Panadería Señor de Sipán</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Warm Bakery Neutrals -->
+    <!-- Application Structure Plan: The application is structured as a single-page narrative journey. It starts with the problem (Introduction), moves to understanding the core economic model via an interactive simulator (Marco Conceptual), presents actionable solutions (Propuesta Tecnológica), weighs the pros and cons (Ventajas y Desafíos), and ends with a clear path forward (Conclusiones). This structure was chosen to guide the user logically from the "what" and "why" to the "how," with the interactive simulator as the central engagement point to make abstract concepts tangible and memorable. -->
+    <!-- Visualization & Content Choices: The core visualization is the interactive production function chart (Chart.js), which directly addresses the user's question about modeling production. Sliders are used for interaction as they provide immediate, tactile feedback. The rest of the content is organized into clean, scannable cards and tabbed sections, using icons and clear typography to improve readability and engagement, avoiding cognitive overload. The LLM integrations enhance the "Propuesta de Soluciones Tecnológicas" section by offering deeper insights on demand, creative product ideas, dynamic marketing slogan/description generation, ingredient optimization suggestions, social media content generation, and customer feedback analysis. The challenge analysis buttons provide strategic advice for overcoming obstacles. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Readex Pro', sans-serif;
+            background-color: #FDFBF7;
+            color: #4A2E2A;
+        }
+        .nav-link {
+            transition: color 0.3s, border-bottom-color 0.3s;
+            border-bottom: 2px solid transparent;
+        }
+        .nav-link:hover, .nav-link.active {
+            color: #D35400;
+            border-bottom-color: #D35400;
+        }
+        .tab-button {
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .tab-button.active {
+            background-color: #D35400;
+            color: #FFFFFF;
+        }
+        .card-hover {
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .loading-spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: #D35400;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            vertical-align: middle;
+            margin-left: 8px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .llm-response {
+            background-color: #FFFBEB;
+            border-left: 4px solid #F39C12;
+            padding: 1rem;
+            margin-top: 1rem;
+            color: #7D5A2E;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            max-height: 200px;
+            overflow-y: auto;
+            border-radius: 0.25rem;
+            box-shadow: inset 0 1px 3px 0 rgba(0,0,0,0.05);
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Header & Navigation -->
+    <header class="bg-[#FDFBF7]/80 backdrop-blur-lg sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <h1 class="text-xl font-bold text-[#A96648]">Panadería Señor de Sipán</h1>
+            <div class="hidden md:flex space-x-8">
+                <a href="#introduccion" class="nav-link pb-1">Introducción</a>
+                <a href="#simulador" class="nav-link pb-1">Marco Conceptual</a>
+                <a href="#soluciones" class="nav-link pb-1">Propuestas de Soluciones</a>
+                <a href="#balance" class="nav-link pb-1">Ventajas y Desafios</a>
+                <a href="#conclusiones" class="nav-link pb-1">Conclusiones</a>
+            </div>
+            <button id="mobile-menu-button" class="md:hidden text-2xl">☰</button>
+        </nav>
+        <div id="mobile-menu" class="hidden md:hidden px-6 pb-4 flex flex-col space-y-2">
+            <a href="#introduccion" class="nav-link py-2 text-center">Introducción</a>
+            <a href="#simulador" class="nav-link py-2 text-center">Marco Conceptual</a>
+            <a href="#soluciones" class="nav-link py-2 text-center">Propuestas de Soluciones</a>
+            <a href="#balance" class="nav-link py-2 text-center">Ventajas y Desafios</a>
+            <a href="#conclusiones" class="nav-link py-2 text-center">Conclusiones</a>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-6 py-12">
+
+        <!-- Section 1: Introducción -->
+        <section id="introduccion" class="mb-24 text-center">
+            <h1 class="text-3xl font-bold mb-4 text-[#A96648]"> La Panadería "Señor de Sipán": Un Caso de Éxito y Oportunidad</h1>
+            <h2 class="text-3xl font-bold mb-4 text-[#A96648]">Un Caso de Éxito y Oportunidad</h2>
+            <p class="max-w-3xl mx-auto text-lg text-[#6B4F4B] mb-12">
+                Tras un notable éxito en participación de mercado gracias al E-commerce, la Panadería Señor de Sipán enfrenta un nuevo desafío: la optimización de su producción interna. A pesar de las altas ventas, existen ineficiencias que limitan su potencial de crecimiento.
+            </p>
+            <h2 class="text-3xl font-bold mb-4 text-[#A96648]">Problemas Observados</h2>
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                
+                <div class="bg-white p-6 rounded-lg shadow-md card-hover">
+                    <div class="text-4xl mb-4">👥</div>
+                    <h3 class="text-xl font-semibold mb-2 text-[#D35400]">Subutilización de Personal</h3>
+                    <p class="text-[#6B4F4B]">Asignación de tareas no alineada con los picos de demanda, generando costos y personal ocioso.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md card-hover">
+                    <div class="text-4xl mb-4">⚙️</div>
+                    <h3 class="text-xl font-semibold mb-2 text-[#D35400]">Desgaste de Maquinaria</h3>
+                    <p class="text-[#6B4F4B]">Falta de mantenimiento predictivo que causa paradas inesperadas y reduce la vida útil de los equipos.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md card-hover">
+                    <div class="text-4xl mb-4">🌾</div>
+                    <h3 class="text-xl font-semibold mb-2 text-[#D35400]">Desperdicio de Insumos</h3>
+                    <p class="text-[#6B4F4B]">Gestión de inventario manual que resulta en excesos o faltantes de materia prima.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md card-hover">
+                    <div class="text-4xl mb-4">📉</div>
+                    <h3 class="text-xl font-semibold mb-2 text-[#D35400]">Implementación Lenta</h3>
+                    <p class="text-[#6B4F4B]">Dificultad para incorporar y medir el impacto de nuevas recetas o tecnologías de producción.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: Simulador -->
+        <section id="simulador" class="mb-24 bg-white p-8 rounded-xl shadow-lg">
+            <h1 class="text-4xl font-bold mb-4 text-[#A96648]"> Marco Conceptual de los Terminos Economicos </h1>
+            <div class="text-center mb-12">
+                <h2 class="text-center font-bold mb-4 text-[#A96648]">Simulador Interactivo de los Factores Producción</h2>
+                <p class="max-w-3xl mx-auto text-lg text-[#6B4F4B]">
+                    Para entender cómo optimizar, primero debemos modelar la producción. Usamos la función Cobb-Douglas: <span class="font-mono bg-gray-100 p-1 rounded">Q = A · L<sup>α</sup> · K<sup>β</sup> · T<sup>γ</sup></span>. Interactúa con los insumos para ver su impacto en la producción total.
+                </p>
+            </div>
+            <div class="grid lg:grid-cols-3 gap-8 items-center">
+                <div class="lg:col-span-1 space-y-6">
+                    <div>
+                        <label for="trabajo-slider" class="flex justify-between font-medium text-[#6B4F4B]"><span>Trabajo (L)</span> <span id="trabajo-value" class="font-bold text-[#D35400]">10</span></label>
+                        <input id="trabajo-slider" type="range" min="1" max="20" value="10" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                    </div>
+                    <div>
+                        <label for="capital-slider" class="flex justify-between font-medium text-[#6B4F4B]"><span>Capital (K)</span> <span id="capital-value" class="font-bold text-[#D35400]">10</span></label>
+                        <input id="capital-slider" type="range" min="1" max="20" value="10" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                    </div>
+                    <div>
+                        <label for="tecnologia-slider" class="flex justify-between font-medium text-[#6B4F4B]"><span>Tecnología (T)</span> <span id="tecnologia-value" class="font-bold text-[#D35400]">8</span></label>
+                        <input id="tecnologia-slider" type="range" min="1" max="15" value="8" step="0.5" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                    </div>
+                     <div class="text-center mt-4">
+                        <p class="text-lg text-[#6B4F4B]">Producción Total Estimada (Q):</p>
+                        <p id="produccion-total" class="text-5xl font-bold text-[#D35400]">--</p>
+                    </div>
+                </div>
+                <div class="lg:col-span-2">
+                    <div class="chart-container relative w-full mx-auto h-[40vh] max-h-[400px]">
+                        <canvas id="productionChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: Soluciones TIC -->
+        <section id="soluciones" class="mb-24">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-bold mb-4 text-[#A96648]">Propuesta de Soluciones Tecnológicas</h2>
+                <p class="max-w-3xl mx-auto text-lg text-[#6B4F4B]">
+                    Proponemos un plan de modernización basado en TIC para optimizar cada factor de producción y superar los desafíos actuales.
+                </p>
+            </div>
+            <div>
+                <div class="flex justify-center mb-8 border-b border-gray-200">
+                    <button data-tab="trabajo" class="tab-button active text-lg font-semibold py-3 px-6 rounded-t-lg">Trabajo</button>
+                    <button data-tab="capital" class="tab-button text-lg font-semibold py-3 px-6 rounded-t-lg">Capital</button>
+                    <button data-tab="tecnologia" class="tab-button text-lg font-semibold py-3 px-6 rounded-t-lg">Tecnología</button>
+                </div>
+                <div id="tab-content" class="bg-white p-8 rounded-xl shadow-lg">
+                    <!-- Tab Trabajo -->
+                    <div id="tab-trabajo" class="tab-panel grid md:grid-cols-2 gap-8">
+                        <div>
+                            <h3 class="text-2xl font-semibold text-[#D35400] mb-4">Sistema de Gestión de Fuerza Laboral (WFM)</h3>
+                            <p class="text-[#6B4F4B] mb-2"><strong>Ejemplo:</strong> Software `TurnoPro` para programar horarios basados en previsiones de demanda del e-commerce.</p>
+                            <p class="text-[#6B4F4B]"><strong>Impacto:</strong> Reducción de horas ociosas, cobertura óptima en horas pico y optimización de costos laborales.</p>
+                            <button class="generate-details-btn mt-4 px-4 py-2 bg-[#F39C12] text-white rounded-md hover:bg-[#E67E22] transition-colors" data-solution="Sistema de Gestión de Fuerza Laboral (WFM)">Generar Detalles ✨</button>
+                            <div class="llm-response-area mt-4" id="wfm-llm-response"></div>
+                        </div>
+                        <div>
+                            <h3 class="text-2xl font-semibold text-[#D35400] mb-4">Plataformas de Capacitación Online</h3>
+                            <p class="text-[#6B4F4B] mb-2"><strong>Ejemplo:</strong> Módulos e-learning `AprendeHorneando` para nuevas recetas o uso de maquinaria, accesibles en la panadería.</p>
+                            <p class="text-[#6B4F4B]"><strong>Impacto:</strong> Estandarización de la calidad, reducción del tiempo de aprendizaje y mejora de la versatilidad del personal.</p>
+                            <button class="generate-details-btn mt-4 px-4 py-2 bg-[#F39C12] text-white rounded-md hover:bg-[#E67E22] transition-colors" data-solution="Plataformas de Capacitación Online">Generar Detalles ✨</button>
+                            <div class="llm-response-area mt-4" id="capacitacion-llm-response"></div>
+                        </div>
+                    </div>
+                    <!-- Tab Capital -->
+                    <div id="tab-capital" class="tab-panel hidden grid md:grid-cols-2 gap-8">
+                        <div>
+                            <h3 class="text-2xl font-semibold text-[#D35400] mb-4">Gestión de Mantenimiento (CMMS)</h3>
+                            <p class="text-[#6B4F4B] mb-2"><strong>Ejemplo:</strong> Adoptar `ManténPan` para programar mantenimiento preventivo de hornos y amasadoras según su uso.</p>
+                            <p class="text-[#6B4F4B]"><strong>Impacto:</strong> Reducción de averías, prolongación de la vida útil de los equipos y garantía de disponibilidad.</p>
+                            <button class="generate-details-btn mt-4 px-4 py-2 bg-[#F39C12] text-white rounded-md hover:bg-[#E67E22] transition-colors" data-solution="Gestión de Mantenimiento (CMMS)">Generar Detalles ✨</button>
+                            <div class="llm-response-area mt-4" id="cmms-llm-response"></div>
+                        </div>
+                        <div>
+                            <h3 class="text-2xl font-semibold text-[#D35400] mb-4">Sensores IoT en Equipos Clave</h3>
+                            <p class="text-[#6B4F4B] mb-2"><strong>Ejemplo:</strong> Instalar sensores de temperatura y consumo energético en hornos para monitoreo en tiempo real.</p>
+                            <p class="text-[#6B4F4B]"><strong>Impacto:</strong> Optimización del consumo de energía, detección temprana de anomalías y horneado perfecto.</p>
+                            <button class="generate-details-btn mt-4 px-4 py-2 bg-[#F39C12] text-white rounded-md hover:bg-[#E67E22] transition-colors" data-solution="Sensores IoT en Equipos Clave">Generar Detalles ✨</button>
+                            <div class="llm-response-area mt-4" id="iot-llm-response"></div>
+                        </div>
+                    </div>
+                    <!-- Tab Tecnologia -->
+                    <div id="tab-tecnologia" class="tab-panel grid gap-8">
+                        <div>
+                            <h3 class="text-2xl font-semibold text-[#D35400] mb-4">Gestión de Recetas y Procesos (MES)</h3>
+                            <p class="text-[#6B4F4B] mb-2"><strong>Ejemplo:</strong> Sistema `RecetasMaestras` para centralizar recetas, procedimientos y gestión de inventario.</p>
+                            <p class="text-[#6B4F4B]"><strong>Impacto:</strong> Calidad estandarizada, reducción drástica de desperdicios y trazabilidad completa de lotes.</p>
+                            <button class="generate-details-btn mt-4 px-4 py-2 bg-[#F39C12] text-white rounded-md hover:bg-[#E67E22] transition-colors" data-solution="Gestión de Recetas y Procesos (MES)">Generar Detalles ✨</button>
+                            <div class="llm-response-area mt-4" id="mes-llm-response"></div>
+                        </div>
+                        <div>
+                            <h3 class="text-2xl font-semibold text-[#D35400] mb-4">Análisis de Datos (BI)</h3>
+                            <p class="text-[#6B4F4B] mb-2"><strong>Ejemplo:</strong> Usar Power BI o Tableau para analizar rendimiento por receta, consumo de ingredientes y tiempos.</p>
+                            <p class="text-[#6B4F4B]"><strong>Impacto:</strong> Identificación de eficiencias, optimización de formulaciones y apoyo a decisiones estratégicas.</p>
+                            <button class="generate-details-btn mt-4 px-4 py-2 bg-[#F39C12] text-white rounded-md hover:bg-[#E67E22] transition-colors" data-solution="Análisis de Datos (BI)">Generar Detalles ✨</button>
+                            <div class="llm-response-area mt-4" id="bi-llm-response"></div>
+                        </div>
+
+                        <div class="col-span-full mt-8 p-6 bg-yellow-50 rounded-lg shadow-inner">
+                            <h3 class="text-2xl font-semibold text-[#D35400] mb-4">Generador de Ideas de Producto ✨</h3>
+                            <p class="text-[#6B4F4B] mb-4">¿Buscas una nueva idea de producto para la Panadería Señor de Sipán? Ingresa una palabra clave o concepto y la IA te ayudará a inspirarte.</p>
+                            <div class="flex flex-col sm:flex-row gap-4">
+                                <input type="text" id="product-idea-input" placeholder="Ej: frutas exóticas, sin gluten, postres peruanos" class="flex-grow p-3 border border-gray-300 rounded-md focus:ring-[#D35400] focus:border-[#D35400] text-[#4A2E2A]">
+                                <button id="generate-product-idea-btn" class="px-6 py-3 bg-[#D35400] text-white rounded-md hover:bg-[#E67E22] transition-colors flex-shrink-0">Generar Idea ✨</button>
+                            </div>
+                            <div class="llm-response-area mt-4" id="product-idea-llm-response"></div>
+                        </div>
+
+                        <div class="col-span-full mt-8 p-6 bg-blue-50 rounded-lg shadow-inner">
+                            <h3 class="text-2xl font-semibold text-[#D35400] mb-4">Generador de Slogans y Descripciones ✨</h3>
+                            <p class="text-[#6B4F4B] mb-4">Crea mensajes de marketing atractivos para tus productos. Introduce el nombre de un producto para generar slogans y descripciones.</p>
+                            <div class="flex flex-col sm:flex-row gap-4">
+                                <input type="text" id="slogan-product-input" placeholder="Ej: Pan de Quinua, Alfajor de Lúcuma" class="flex-grow p-3 border border-gray-300 rounded-md focus:ring-[#D35400] focus:border-[#D35400] text-[#4A2E2A]">
+                                <button id="generate-slogan-btn" class="px-6 py-3 bg-[#D35400] text-white rounded-md hover:bg-[#E67E22] transition-colors flex-shrink-0">Generar Slogan ✨</button>
+                            </div>
+                            <div class="llm-response-area mt-4" id="slogan-llm-response"></div>
+                        </div>
+
+                        <div class="col-span-full mt-8 p-6 bg-purple-50 rounded-lg shadow-inner">
+                            <h3 class="text-2xl font-semibold text-[#D35400] mb-4">Sugerencias de Optimización de Ingredientes ✨</h3>
+                            <p class="text-[#6B4F4B] mb-4">Optimiza tus recetas. Ingresa un ingrediente para obtener sugerencias sobre cómo sustituirlo o mejorarlo por salud, costo o sostenibilidad.</p>
+                            <div class="flex flex-col sm:flex-row gap-4">
+                                <input type="text" id="ingredient-input" placeholder="Ej: Azúcar, Harina de Trigo, Mantequilla" class="flex-grow p-3 border border-gray-300 rounded-md focus:ring-[#D35400] focus:border-[#D35400] text-[#4A2E2A]">
+                                <button id="optimize-ingredient-btn" class="px-6 py-3 bg-[#D35400] text-white rounded-md hover:bg-[#E67E22] transition-colors flex-shrink-0">Optimizar Ingrediente ✨</button>
+                            </div>
+                            <div class="llm-response-area mt-4" id="ingredient-llm-response"></div>
+                        </div>
+
+                        <div class="col-span-full mt-8 p-6 bg-orange-50 rounded-lg shadow-inner">
+                            <h3 class="text-2xl font-semibold text-[#D35400] mb-4">Generador de Contenido para Redes Sociales ✨</h3>
+                            <p class="text-[#6B4F4B] mb-4">Crea rápidamente ideas de publicaciones para tus redes sociales. Introduce un producto o tema.</p>
+                            <div class="flex flex-col sm:flex-row gap-4">
+                                <input type="text" id="social-content-input" placeholder="Ej: Panetón navideño, Café de la mañana" class="flex-grow p-3 border border-gray-300 rounded-md focus:ring-[#D35400] focus:border-[#D35400] text-[#4A2E2A]">
+                                <button id="generate-social-content-btn" class="px-6 py-3 bg-[#D35400] text-white rounded-md hover:bg-[#E67E22] transition-colors flex-shrink-0">Generar Contenido ✨</button>
+                            </div>
+                            <div class="llm-response-area mt-4" id="social-content-llm-response"></div>
+                        </div>
+
+                        <div class="col-span-full mt-8 p-6 bg-gray-100 rounded-lg shadow-inner">
+                            <h3 class="text-2xl font-semibold text-[#D35400] mb-4">Análisis de Feedback de Clientes ✨</h3>
+                            <p class="text-[#6B4F4B] mb-4">Analiza comentarios de clientes para entender el sentimiento y obtener sugerencias de respuesta/acción.</p>
+                            <div class="flex flex-col gap-4">
+                                <textarea id="customer-feedback-input" placeholder="Ej: El pan estaba delicioso, pero la entrega tardó mucho." rows="3" class="flex-grow p-3 border border-gray-300 rounded-md focus:ring-[#D35400] focus:border-[#D35400] text-[#4A2E2A]"></textarea>
+                                <button id="analyze-feedback-btn" class="px-6 py-3 bg-[#D35400] text-white rounded-md hover:bg-[#E67E22] transition-colors self-start">Analizar Feedback ✨</button>
+                            </div>
+                            <div class="llm-response-area mt-4" id="feedback-llm-response"></div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 4: Balance -->
+        <section id="balance" class="mb-24">
+             <div class="text-center mb-12">
+                <h2 class="text-4xl font-bold mb-4 text-[#A96648]">Balance de la Transformación Digital</h2>
+                <p class="max-w-3xl mx-auto text-lg text-[#6B4F4B]">
+                    Toda implementación tecnológica implica una evaluación de sus beneficios y los desafíos a superar.
+                </p>
+            </div>
+            <div class="grid md:grid-cols-2 gap-8">
+                <div class="bg-green-50 p-8 rounded-lg border border-green-200">
+                    <h3 class="text-2xl font-bold text-green-800 mb-4">Ventajas y Oportunidades</h3>
+                    <ul class="space-y-3 text-green-700">
+                        <li class="flex items-start"><span class="mr-3 text-lg">✅</span> Aumento de la productividad y reducción de costos.</li>
+                        <li class="flex items-start"><span class="mr-3 text-lg">✅</span> Mejora de la calidad y consistencia del producto final.</li>
+                        <li class="flex items-start"><span class="mr-3 text-lg">✅</span> Mayor flexibilidad para adaptarse a la demanda.</li>
+                        <li class="flex items-start"><span class="mr-3 text-lg">✅</span> Toma de decisiones informada basada en datos reales.</li>
+                        <li class="flex items-start"><span class="mr-3 text-lg">✅</span> Ventaja competitiva sostenible en el mercado local.</li>
+                    </ul>
+                </div>
+                <div class="bg-red-50 p-8 rounded-lg border border-red-200">
+                     <h3 class="text-2xl font-bold text-red-800 mb-4">Desafíos y Consideraciones</h3>
+                    <ul class="space-y-3 text-red-700">
+                        <li class="flex flex-col items-start"><span class="mr-3 text-lg">❌</span> Inversión inicial en software, hardware y capacitación.
+                            <button class="analyze-challenge-btn mt-2 px-3 py-1 bg-red-400 text-white text-sm rounded-md hover:bg-red-500 transition-colors" data-challenge="Inversión inicial en software, hardware y capacitación.">Analizar Desafío ✨</button>
+                            <div class="llm-response-area mt-2 w-full" id="challenge-inversion-llm-response"></div>
+                        </li>
+                        <li class="flex flex-col items-start"><span class="mr-3 text-lg">❌</span> Resistencia al cambio por parte del personal.
+                             <button class="analyze-challenge-btn mt-2 px-3 py-1 bg-red-400 text-white text-sm rounded-md hover:bg-red-500 transition-colors" data-challenge="Resistencia al cambio por parte del personal.">Analizar Desafío ✨</button>
+                             <div class="llm-response-area mt-2 w-full" id="challenge-resistencia-llm-response"></div>
+                        </li>
+                        <li class="flex flex-col items-start"><span class="mr-3 text-lg">❌</span> Curva de aprendizaje para dominar los nuevos sistemas.
+                             <button class="analyze-challenge-btn mt-2 px-3 py-1 bg-red-400 text-white text-sm rounded-md hover:bg-red-500 transition-colors" data-challenge="Curva de aprendizaje para dominar los nuevos sistemas.">Analizar Desafío ✨</button>
+                             <div class="llm-response-area mt-2 w-full" id="challenge-curva-llm-response"></div>
+                        </li>
+                        <li class="flex flex-col items-start"><span class="mr-3 text-lg">❌</span> Necesidad de integrar diferentes soluciones TIC.
+                             <button class="analyze-challenge-btn mt-2 px-3 py-1 bg-red-400 text-white text-sm rounded-md hover:bg-red-500 transition-colors" data-challenge="Necesidad de integrar diferentes soluciones TIC.">Analizar Desafío ✨</button>
+                             <div class="llm-response-area mt-2 w-full" id="challenge-integracion-llm-response"></div>
+                        </li>
+                        <li class="flex flex-col items-start"><span class="mr-3 text-lg">❌</span> Garantizar la seguridad de los datos y recetas.
+                             <button class="analyze-challenge-btn mt-2 px-3 py-1 bg-red-400 text-white text-sm rounded-md hover:bg-red-500 transition-colors" data-challenge="Garantizar la seguridad de los datos y recetas.">Analizar Desafío ✨</button>
+                             <div class="llm-response-area mt-2 w-full" id="challenge-seguridad-llm-response"></div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Section 5: Conclusiones -->
+        <section id="conclusiones" class="mb-12 bg-white p-8 rounded-xl shadow-lg">
+             <div class="text-center mb-12">
+                <h2 class="text-4xl font-bold mb-4 text-[#A96648]">Conclusiones y El Camino a Seguir</h2>
+                <p class="max-w-3xl mx-auto text-lg text-[#6B4F4B]">
+                    La optimización interna es el siguiente paso lógico para capitalizar el éxito del e-commerce. La transformación digital es un proceso continuo que llevará a la panadería a un nuevo nivel de eficiencia y competitividad.
+                </p>
+            </div>
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="bg-gray-50 p-6 rounded-lg">
+                    <h4 class="font-bold text-lg mb-2 text-[#D35400]">1. Auditoría Tecnológica</h4>
+                    <p class="text-[#6B4F4B]">Realizar un análisis detallado de los procesos actuales para identificar las TIC más adecuadas.</p>
+                </div>
+                <div class="bg-gray-50 p-6 rounded-lg">
+                    <h4 class="font-bold text-lg mb-2 text-[#D35400]">2. Implementación por Fases</h4>
+                    <p class="text-[#6B4F4B]">Iniciar con un proyecto piloto (e.g., gestión de inventario) para aprender y ajustar.</p>
+                </div>
+                <div class="bg-gray-50 p-6 rounded-lg">
+                    <h4 class="font-bold text-lg mb-2 text-[#D35400]">3. Capacitación Continua</h4>
+                    <p class="text-[#6B4F4B]">Invertir en la formación del personal para asegurar la adopción de las nuevas herramientas.</p>
+                </div>
+                <div class="bg-gray-50 p-6 rounded-lg">
+                    <h4 class="font-bold text-lg mb-2 text-[#D35400]">4. Monitoreo y Ajuste</h4>
+                    <p class="text-[#6B4F4B]">Utilizar los datos generados para evaluar constantemente la eficiencia y realizar mejoras.</p>
+                </div>
+                <div class="bg-gray-50 p-6 rounded-lg">
+                    <h4 class="font-bold text-lg mb-2 text-[#D35400]">5. Cultura de Innovación</h4>
+                    <p class="text-[#6B4F4B]">Fomentar una mentalidad abierta a la mejora continua y a la experimentación tecnológica.</p>
+                </div>
+                 <div class="bg-gray-50 p-6 rounded-lg">
+                    <h4 class="font-bold text-lg mb-2 text-[#D35400]">6. Integración de Sistemas</h4>
+                    <p class="text-[#6B4F4B]">Asegurar que las diferentes soluciones tecnológicas puedan comunicarse entre sí para maximizar su valor.</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-white border-t border-gray-200">
+        <div class="container mx-auto px-6 py-6 text-center text-[#6B4F4B]">
+            <p>&copy; 2025 Panadería Señor de Sipán | Propuesta de Transformación Digital</p>
+            <p class="text-sm mt-1">Basado en la tesis de Flores Rico, E. & Rojas Martinez, A. (2021) y un caso hipotético de optimización.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // Mobile Menu
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+
+            // Navigation scroll highlighting
+            const sections = document.querySelectorAll('section');
+            const navLinks = document.querySelectorAll('.nav-link');
+
+            window.addEventListener('scroll', () => {
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    if (pageYOffset >= sectionTop - 100) {
+                        current = section.getAttribute('id');
+                    }
+                });
+
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href').includes(current)) {
+                        link.classList.add('active');
+                    }
+                });
+            });
+
+
+            // --- Production Simulator Logic ---
+            const trabajoSlider = document.getElementById('trabajo-slider');
+            const capitalSlider = document.getElementById('capital-slider');
+            const tecnologiaSlider = document.getElementById('tecnologia-slider');
+            const trabajoValue = document.getElementById('trabajo-value');
+            const capitalValue = document.getElementById('capital-value');
+            const tecnologiaValue = document.getElementById('tecnologia-value');
+            const produccionTotal = document.getElementById('produccion-total');
+
+            const A = 10;
+            const alpha = 0.4;
+            const beta = 0.3;
+            const gamma = 0.3;
+
+            const productionFunction = (L, K, T) => A * (L ** alpha) * (K ** beta) * (T ** gamma);
+
+            const ctx = document.getElementById('productionChart').getContext('2d');
+            let productionChart;
+
+            const initializeChart = () => {
+                productionChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: [],
+                        datasets: [{
+                            label: 'Producción vs Trabajo (L)',
+                            data: [],
+                            borderColor: '#D35400',
+                            backgroundColor: 'rgba(211, 84, 0, 0.1)',
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: {
+                                title: { display: true, text: 'Unidades de Trabajo (L)', font: { size: 14 } }
+                            },
+                            y: {
+                                title: { display: true, text: 'Producción (Q)', font: { size: 14 } },
+                                beginAtZero: true
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    title: (tooltipItems) => `Trabajo: ${tooltipItems[0].label}`,
+                                    label: (tooltipItem) => `Producción: ${tooltipItem.formattedValue}`
+                                }
+                            }
+                        }
+                    }
+                });
+            };
+            
+            const updateChart = () => {
+                const L = parseFloat(trabajoSlider.value);
+                const K = parseFloat(capitalSlider.value);
+                const T = parseFloat(tecnologiaSlider.value);
+
+                trabajoValue.textContent = L;
+                capitalValue.textContent = K;
+                tecnologiaValue.textContent = T.toFixed(1);
+
+                const totalQ = productionFunction(L, K, T);
+                produccionTotal.textContent = totalQ.toFixed(2);
+
+                const L_range = Array.from({ length: 20 }, (_, i) => i + 1);
+                const Q_data = L_range.map(l_val => productionFunction(l_val, K, T));
+
+                productionChart.data.labels = L_range;
+                productionChart.data.datasets[0].data = Q_data;
+                productionChart.update();
+            };
+
+            [trabajoSlider, capitalSlider, tecnologiaSlider].forEach(slider => {
+                slider.addEventListener('input', updateChart);
+            });
+
+            initializeChart();
+            updateChart();
+
+
+            // --- Tab Logic ---
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const tabPanels = document.querySelectorAll('.tab-panel');
+
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const targetTab = button.dataset.tab;
+
+                    tabButtons.forEach(btn => {
+                        btn.classList.remove('active');
+                        btn.classList.remove('bg-[#D35400]', 'text-white');
+                    });
+                    button.classList.add('active');
+                    button.classList.add('bg-[#D35400]', 'text-white');
+                    
+                    tabPanels.forEach(panel => {
+                        if (panel.id === `tab-${targetTab}`) {
+                            panel.classList.remove('hidden');
+                        } else {
+                            panel.classList.add('hidden');
+                        }
+                    });
+                });
+            });
+
+            // --- Gemini API LLM Integration (General Function) ---
+            async function callGeminiAPI(prompt, responseAreaElement) {
+                responseAreaElement.innerHTML = '<div class="loading-spinner"></div> Cargando detalles...';
+
+                let chatHistory = [];
+                chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+                const payload = { contents: chatHistory };
+                const apiKey = "";
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    const result = await response.json();
+                    
+                    if (result.candidates && result.candidates.length > 0 &&
+                        result.candidates[0].content && result.candidates[0].content.parts &&
+                        result.candidates[0].content.parts.length > 0) {
+                        const text = result.candidates[0].content.parts[0].text;
+                        responseAreaElement.innerHTML = `<div class="llm-response">${text}</div>`;
+                    } else {
+                        responseAreaElement.innerHTML = '<div class="text-red-600">Error: No se pudo generar la explicación.</div>';
+                    }
+                } catch (error) {
+                    responseAreaElement.innerHTML = `<div class="text-red-600">Error en la conexión: ${error.message}</div>`;
+                }
+            }
+
+            // --- Gemini API LLM Integration (Solution Details) ---
+            const generateButtons = document.querySelectorAll('.generate-details-btn');
+            generateButtons.forEach(button => {
+                button.addEventListener('click', async () => {
+                    const solutionName = button.dataset.solution;
+                    const responseArea = button.nextElementSibling;
+                    const prompt = `Describe en detalle cómo "${solutionName}" beneficiaría específicamente a la Panadería y Pastelería "Señor de Sipán" en Lambayeque, considerando un contexto de crecimiento gracias al e-commerce pero con ineficiencias internas. Enfócate en ejemplos prácticos y el impacto directo en sus operaciones.`;
+                    callGeminiAPI(prompt, responseArea);
+                });
+            });
+
+            // --- Gemini API LLM Integration (Product Idea Generator) ---
+            const generateProductIdeaBtn = document.getElementById('generate-product-idea-btn');
+            const productIdeaInput = document.getElementById('product-idea-input');
+            const productIdeaResponseArea = document.getElementById('product-idea-llm-response');
+
+            generateProductIdeaBtn.addEventListener('click', async () => {
+                const keyword = productIdeaInput.value.trim();
+                let prompt = `Genera una idea de nuevo producto de panadería o pastelería para la "Panadería Señor de Sipán" en Lambayeque. Incluye un nombre creativo, una breve descripción y qué lo hace único.`;
+                if (keyword) {
+                    prompt += ` Considera el concepto o ingrediente clave: "${keyword}".`;
+                }
+                callGeminiAPI(prompt, productIdeaResponseArea);
+            });
+
+            // --- Gemini API LLM Integration (Slogan and Description Generator) ---
+            const generateSloganBtn = document.getElementById('generate-slogan-btn');
+            const sloganProductInput = document.getElementById('slogan-product-input');
+            const sloganLLMResponseArea = document.getElementById('slogan-llm-response');
+
+            generateSloganBtn.addEventListener('click', async () => {
+                const productName = sloganProductInput.value.trim();
+                if (!productName) {
+                    sloganLLMResponseArea.innerHTML = '<div class="text-red-600">Por favor, ingresa un nombre de producto.</div>';
+                    return;
+                }
+                const prompt = `Genera 3 eslóganes cortos y una descripción de producto atractiva para "${productName}", considerando que es de una panadería tradicional pero moderna en Lambayeque, Perú, que tiene éxito con e-commerce.`;
+                callGeminiAPI(prompt, sloganLLMResponseArea);
+            });
+
+            // --- Gemini API LLM Integration (Ingredient Optimization Suggestions) ---
+            const optimizeIngredientBtn = document.getElementById('optimize-ingredient-btn');
+            const ingredientInput = document.getElementById('ingredient-input');
+            const ingredientLLMResponseArea = document.getElementById('ingredient-llm-response');
+
+            optimizeIngredientBtn.addEventListener('click', async () => {
+                const ingredientName = ingredientInput.value.trim();
+                if (!ingredientName) {
+                    ingredientLLMResponseArea.innerHTML = '<div class="text-red-600">Por favor, ingresa un ingrediente.</div>';
+                    return;
+                }
+                const prompt = `Para la Panadería Señor de Sipán, ¿qué sugerencias tienes para sustituir o optimizar el uso de "${ingredientName}" en sus recetas? Considera aspectos como mejora de salud (reducir azúcar/grasas), costo (alternativas más económicas) o sostenibilidad (opciones locales/ecológicas).`;
+                callGeminiAPI(prompt, ingredientLLMResponseArea);
+            });
+
+            // --- Gemini API LLM Integration (Social Media Content Generator) ---
+            const generateSocialContentBtn = document.getElementById('generate-social-content-btn');
+            const socialContentInput = document.getElementById('social-content-input');
+            const socialContentLLMResponseArea = document.getElementById('social-content-llm-response');
+
+            generateSocialContentBtn.addEventListener('click', async () => {
+                const contentTheme = socialContentInput.value.trim();
+                if (!contentTheme) {
+                    socialContentLLMResponseArea.innerHTML = '<div class="text-red-600">Por favor, ingresa un producto o tema.</div>';
+                    return;
+                }
+                const prompt = `Genera una idea de publicación corta para redes sociales (Instagram/Facebook) para la Panadería Señor de Sipán sobre "${contentTheme}". Incluye un emoji relevante y un hashtag.`;
+                callGeminiAPI(prompt, socialContentLLMResponseArea);
+            });
+
+            // --- Gemini API LLM Integration (Customer Feedback Analysis) ---
+            const analyzeFeedbackBtn = document.getElementById('analyze-feedback-btn');
+            const customerFeedbackInput = document.getElementById('customer-feedback-input');
+            const feedbackLLMResponseArea = document.getElementById('feedback-llm-response');
+
+            analyzeFeedbackBtn.addEventListener('click', async () => {
+                const feedbackText = customerFeedbackInput.value.trim();
+                if (!feedbackText) {
+                    feedbackLLMResponseArea.innerHTML = '<div class="text-red-600">Por favor, ingresa un comentario del cliente.</div>';
+                    return;
+                }
+                const prompt = `Analiza el siguiente comentario de cliente para la Panadería Señor de Sipán: "${feedbackText}". Determina el sentimiento general (positivo, negativo, neutral) y sugiere una respuesta breve o una acción a tomar por la panadería.`;
+                callGeminiAPI(prompt, feedbackLLMResponseArea);
+            });
+
+            // --- Gemini API LLM Integration (Challenge Analysis) ---
+            const analyzeChallengeButtons = document.querySelectorAll('.analyze-challenge-btn');
+            analyzeChallengeButtons.forEach(button => {
+                button.addEventListener('click', async () => {
+                    const challengeText = button.dataset.challenge;
+                    const responseArea = button.nextElementSibling;
+                    const prompt = `Para la Panadería y Pastelería "Señor de Sipán", ¿cómo se podría mitigar el siguiente desafío en el contexto de su transformación digital: "${challengeText}"? Ofrece 2-3 estrategias concisas y prácticas.`;
+                    callGeminiAPI(prompt, responseArea);
+                });
+            });
+
+        });
+    </script>
+</body>
+</html>
